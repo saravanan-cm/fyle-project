@@ -9,6 +9,12 @@
 - `username and password` is required to authorize the API calls
 - username = `testuser`
 - password = `secretfyle`
+- Sample curl request with Auth headers,
+```
+curl -X GET \
+  'https://fyle-project.herokuapp.com/banks?ifsc=ZSBL0000341' \
+  -H 'Authorization: Basic dGVzdHVzZXI6c2VjcmV0ZnlsZQ==' 
+```
 
 ## Response formats
 ### Response for IFSC code based API calls
