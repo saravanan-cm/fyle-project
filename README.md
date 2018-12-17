@@ -1,5 +1,8 @@
 # Fyle Project
 
+## Languages and Tools involved
+- Python, Flask, HTML/CSS, JavaScript, Heroku
+
 ## Methods and Params
 - GET:  **https://fyle-project.herokuapp.com/banks**
 - `ifsc, bank_name, city` are used as query params
