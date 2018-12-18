@@ -89,16 +89,16 @@ def get_tasks():
                     "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Banks.name = :name and Branches.city = :city limit 200", {"name": name, "city": city})
                 bank = extractRows(result)
 
-            elif len(city) and (name is None or len(name) == 0):
+            elif len(city) and len(name) == 0:
                 city = city.upper()
                 result = db.session.execute(
                     "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Branches.city = :city limit 200", {"city": city})
                 bank = extractRows(result)
 
-            elif len(name) and (city is None or len(city) == 0):
+            elif len(name) and len(city) == 0:
                 name = name.upper()
                 result = db.session.execute(
-                    "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Branches.name = :name limit 200", {"name": name})
+                    "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Banks.name = :name limit 200", {"name": name})
                 bank = extractRows(result)
 
             # Partial matching if there is no exact match
@@ -110,7 +110,7 @@ def get_tasks():
                                                 "name": "%"+name+"%", "city": "%"+city+"%"})
                     bank = extractRows(result)
 
-                elif len(city) and (name is None or len(name) == 0):
+                elif len(city) and len(name) == 0:
                     city = city.upper()
                     result = db.session.execute(
                         "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Branches.city like :city limit 200", {"city": "%"+city+"%"})
@@ -118,10 +118,10 @@ def get_tasks():
                     print type(bank)
                     print len(bank)
 
-                elif len(name) and (city is None or len(city) == 0):
+                elif len(name) and len(city) == 0:
                     name = name.upper()
                     result = db.session.execute(
-                        "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Branches.name like :name limit 200", {"name": "%"+name+"%"})
+                        "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Banks.name like :name limit 200", {"name": "%"+name+"%"})
                     bank = extractRows(result)
 
         except NameError as e:
