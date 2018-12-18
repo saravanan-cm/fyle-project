@@ -69,7 +69,7 @@ curl -X GET \
 
 ### Change Log
 - V1.0.1 `[UPDATE]`
-  - Implemented PostgreSQL.
+  - Integrated PostgreSQL.
   - Response limited to 200 for all API queries for better performance
   - Query param key changed from `bank_name` to `name` while making name and city API calls.
 
