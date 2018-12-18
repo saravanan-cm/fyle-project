@@ -134,7 +134,7 @@ def get_tasks():
                 'count': len(bank),
                 'banks': bank
             }
-    return jsonify(json.dumps(bank))
+    return jsonify(bank)
 
 if __name__ == '__main__':
     app.run(debug=True)
