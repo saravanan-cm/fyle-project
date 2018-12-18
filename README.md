@@ -5,7 +5,7 @@
 
 ## Methods and Params
 - GET:  **https://fyle-project.herokuapp.com/banks**
-- `ifsc, bank_name, city` are used as query params
+- `ifsc, name, city` are used as query params
 
 ## Authentication headers
 - API is authenticated using basic auth technique.
