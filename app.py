@@ -51,7 +51,7 @@ def extractRows(result):
 
 
 @app.route('/banks', methods=['GET'])
-# @auth.login_required  # auth checker for this route
+@auth.login_required  # auth checker for this route
 def get_tasks():
     # Initializing variables
     ifsc = request.args.get('ifsc') or ''
