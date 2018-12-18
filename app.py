@@ -1,14 +1,23 @@
 # Required imports
 import csv
+import os
 import json
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__, static_url_path="")
+
 # CORS origin handler
 cors = CORS(app, resources={r"/banks/*": {"origins": "*"}})
 auth = HTTPBasicAuth()
+
+# Postgres config setup
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://sibsinxgxxlliw:4b5b0ed3b371dbc7b94b5aa4ca10a8c46613b0ab3dddaa018dc1cbb96e3c0920@ec2-23-21-122-141.compute-1.amazonaws.com:5432/d2ivg4cvnakno7'
+
+db = SQLAlchemy(app)
+
 
 # Auth verifier
 @auth.get_password
@@ -30,17 +39,19 @@ def not_found(error):
     return make_response(jsonify({'status': 404, 'error': 'Not found'}), 404)
 
 
-# Bank data loader
-with open("bank_data.json") as file:
-    banks = json.load(file)
-    temp = []
-    for i in banks:
-        temp.append(i)
-    banks = temp
+# Function to convert response into a list of objects
+def extractRows(result):
+    # If no rows were returned in the result, return an empty list
+    if result.returns_rows == False:
+        bank = []
+    # Convert the response to a plain list of dicts
+    else:
+        bank = [dict(row.items()) for row in result]
+    return bank
 
 
 @app.route('/banks', methods=['GET'])
-@auth.login_required  # auth checker for this route
+# @auth.login_required  # auth checker for this route
 def get_tasks():
     # Initializing variables
     ifsc = request.args.get('ifsc')
@@ -49,9 +60,13 @@ def get_tasks():
 
     # Getting details based on IFSC code
     if ifsc:
-        ifsc = ifsc.lower()
+        ifsc = ifsc.upper()
+
         # Quering database for IFSC match
-        bank = filter(lambda t: t['ifsc'].lower() == ifsc, banks)
+        result = db.session.execute(
+            "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Branches.ifsc = :ifsc", {"ifsc": ifsc})
+        bank = extractRows(result)
+
         if len(bank) == 0:
             abort(404)
         else:
@@ -60,37 +75,55 @@ def get_tasks():
                 'count': len(bank),
                 'banks': bank
             }
+
     # Getting details based on Name and City
     elif name or city:
         print "******Entered name and city**********"
         bank = []
         try:
             # Exact match
-            for x in range(0, len(banks)):
-                if len(name) and len(city):
-                    if banks[x]['bank_name'].lower() == name.lower() and banks[x]['city'].lower() == city.lower():
-                        bank.append(banks[x])
-                elif len(name) == 0 and len(city):
-                    if banks[x]['city'].lower() == city.lower():
-                        bank.append(banks[x])
-                elif len(city) == 0 and len(name):
-                    if banks[x]['bank_name'].lower() == name.lower():
-                        bank.append(banks[x])
+            if name and city:
+                city = city.upper()
+                name = name.upper()
+                result = db.session.execute(
+                    "select * from Branches inner join Banks on Banks.id = Branches.bank_id where Banks.name = :name and Branches.city = :city", {"name": name, "city": city})
+                bank = extractRows(result)
+
+            elif len(city) and (name is None or len(name) == 0):
+                city = city.upper()
+                result = db.session.execute(
+                    "select * from Branches inner join Banks on Banks.city = :city", {"city": city})
+                bank = extractRows(result)
+
+            elif len(name) and (city is None or len(city) == 0):
+                name = name.upper()
+                result = db.session.execute(
+                    "select * from Branches inner join Banks on Banks.name = :name", {"name": name})
+                bank = extractRows(result)
 
             # Partial matching if there is no exact match
             if len(bank) == 0:
-                for x in range(0, len(banks)):
-                    if len(name) and len(city):
-                        if banks[x]['bank_name'].lower().find(name.lower()) != -1 and banks[x]['city'].lower().find(city.lower()) != -1:
-                            bank.append(banks[x])
-                    elif len(name) == 0 and len(city):
-                        if banks[x]['city'].lower().find(city.lower()) != -1:
-                            bank.append(banks[x])
-                    elif len(city) == 0 and len(name):
-                        if banks[x]['bank_name'].lower().find(name.lower()) != -1:
-                            bank.append(banks[x])
-        except NameError:
-            print 'Name Error'
+                if name and city:
+                    city = city.upper()
+                    name = name.upper()
+                    result = db.session.execute("select * from Branches inner join Banks on Banks.id = Branches.bank_id where Banks.name like :name and Branches.city like :city", {
+                                                "name": "%"+name+"%", "city": "%"+city+"%"})
+                    bank = extractRows(result)
+
+                elif len(city) and (name is None or len(name) == 0):
+                    city = city.upper()
+                    result = db.session.execute(
+                        "select * from Branches inner join Banks on Banks.city like :city", {"city": "%"+city+"%"})
+                    bank = extractRows(result)
+
+                elif len(name) and (city is None or len(city) == 0):
+                    name = name.upper()
+                    result = db.session.execute(
+                        "select * from Branches inner join Banks on Banks.name like :name", {"name": "%"+name+"%"})
+                    bank = extractRows(result)
+
+        except NameError as e:
+            print e
         if len(bank) == 0:
             abort(404)
         else:
@@ -100,7 +133,6 @@ def get_tasks():
                 'banks': bank
             }
     return jsonify(bank)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
