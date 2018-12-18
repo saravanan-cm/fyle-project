@@ -54,9 +54,9 @@ def extractRows(result):
 # @auth.login_required  # auth checker for this route
 def get_tasks():
     # Initializing variables
-    ifsc = request.args.get('ifsc')
-    name = request.args.get('name')
-    city = request.args.get('city')
+    ifsc = request.args.get('ifsc') or ''
+    name = request.args.get('name') or ''
+    city = request.args.get('city') or ''
 
     # Getting details based on IFSC code
     if ifsc:
