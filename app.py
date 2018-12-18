@@ -51,7 +51,7 @@ def extractRows(result):
 
 
 @app.route('/banks', methods=['GET'])
-@auth.login_required  # auth checker for this route
+# @auth.login_required  # auth checker for this route
 def get_tasks():
     # Initializing variables
     ifsc = request.args.get('ifsc')
@@ -92,13 +92,13 @@ def get_tasks():
             elif len(city) and (name is None or len(name) == 0):
                 city = city.upper()
                 result = db.session.execute(
-                    "select * from Branches inner join Banks on Banks.city = :city", {"city": city})
+                    "select * from Branches inner join Banks on Branches.city = :city", {"city": city})
                 bank = extractRows(result)
 
             elif len(name) and (city is None or len(city) == 0):
                 name = name.upper()
                 result = db.session.execute(
-                    "select * from Branches inner join Banks on Banks.name = :name", {"name": name})
+                    "select * from Branches inner join Banks on Branches.name = :name", {"name": name})
                 bank = extractRows(result)
 
             # Partial matching if there is no exact match
@@ -113,13 +113,13 @@ def get_tasks():
                 elif len(city) and (name is None or len(name) == 0):
                     city = city.upper()
                     result = db.session.execute(
-                        "select * from Branches inner join Banks on Banks.city like :city", {"city": "%"+city+"%"})
+                        "select * from Branches inner join Banks on Branches.city like :city", {"city": "%"+city+"%"})
                     bank = extractRows(result)
 
                 elif len(name) and (city is None or len(city) == 0):
                     name = name.upper()
                     result = db.session.execute(
-                        "select * from Branches inner join Banks on Banks.name like :name", {"name": "%"+name+"%"})
+                        "select * from Branches inner join Banks on Branches.name like :name", {"name": "%"+name+"%"})
                     bank = extractRows(result)
 
         except NameError as e:
