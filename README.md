@@ -20,6 +20,7 @@ curl -X GET \
 ```
 
 ## Response formats
+- `[UPDATE]` Response limited to 200 for all API queries for better performance
 ### Response for IFSC code based API calls
 - GET: **https://fyle-project.herokuapp.com/banks?ifsc=ZSBL0000341**
  ```
