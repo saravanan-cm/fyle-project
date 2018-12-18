@@ -43,7 +43,7 @@ curl -X GET \
   }
 ```
 ### Response for Bank name and City based API calls (also works for partial names)
-- GET: **https://fyle-project.herokuapp.com/banks?bank_name=Zila shakari bank&city=Loni**
+- GET: **https://fyle-project.herokuapp.com/banks?name=Zila shakari bank&city=Loni**
 - This search also works with partial bank name or city names.
 - Supports listing using either City name or Bank name or both. Returns the full list of response where bank/city names match. 
  ```
