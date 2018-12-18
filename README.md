@@ -1,4 +1,5 @@
-# Fyle Project
+# Fyle Project  V1.0.1
+
 
 ## Languages and Tools involved
 - Python, Flask, HTML/CSS, JavaScript, Heroku
@@ -65,3 +66,9 @@ curl -X GET \
       "status": 200
   }
 ```
+
+### Change Log
+- V1.0.1 `[UPDATE]`
+  - Response limited to 200 for all API queries for better performance
+  - Query param key changed from `bank_name` to `name` while making name and city API calls.
+
